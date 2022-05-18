@@ -1,28 +1,30 @@
 import React from "react";
 
-function Item({ item, onUpdateItem, onDeleteItem }) {
+function Item({item, onDelete,onUpdateItem }) {
+  function handleDeleteClick(){
+
+    fetch(`http://localhost:4000/items/${item.id}`,{
+      method:'DELETE'
+    })
+    .then((r)=>r.json())
+    .then(()=>onDelete(item))
+  }
 
   function handleAddToCartClick(){
     fetch(`http://localhost:4000/items/${item.id}`,{
-      method:"PATCH",
+      method: "PATCH",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        isInCart: !item.isInCart,
+        ...item, 
+        isInCart: !item.isInCart
       })
     })
-    .then((r) => r.json())
-    .then((updatedItem) =>  onUpdateItem(updatedItem));
+      .then((r)=>r.json())
+      .then((updatedItem)=>onUpdateItem( updatedItem ))
   }
-
-  function handleDeleteClick(){
-    fetch(`http://localhost:4000/items/${item.id}`,{
-      method:"DELETE",
-    })
-      .then((r) => r.json())
-      .then(() => onDeleteItem(item));
-  }
+  
 
   return (
     <li className={item.isInCart ? "in-cart" : ""}>
@@ -33,8 +35,11 @@ function Item({ item, onUpdateItem, onDeleteItem }) {
       >
         {item.isInCart ? "Remove From" : "Add to"} Cart
       </button>
-      <button className="remove" onClick={handleDeleteClick}>Delete</button>
+      <button className="remove" 
+      onClick={handleDeleteClick}
+      >Delete</button>
     </li>
+    
   );
 }
 

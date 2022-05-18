@@ -1,63 +1,53 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ItemForm from "./ItemForm";
 import Filter from "./Filter";
 import Item from "./Item";
-import { useEffect } from "react/cjs/react.production.min";
-import { json } from "mocha/lib/reporters";
 
 function ShoppingList() {
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [items, setItems] = useState([]);
+  const[items, setItems]=useState([])
+  const[selectedCategory, setSelectedCategory] = useState("All")
 
   useEffect(()=>{
     fetch("http://localhost:4000/items")
-      .then((r)=> r.json)()
-      .then((items) => setItems(items))
-  }, []);
-
-  function handleDeleteItem(deletedItem) {
-    const updatedItems = items.filter((item) => item.id !== deletedItem.id);
-  setItems(updatedItems);
-  }
-
-  function handleUpdateItem(updatedItem) {
-    const updatedItems = items.map((item) => {
-      if (item.id === updatedItem.id) {
-        return updatedItem;
-      } else {
-        return item;
-      }
-    });
-    setItems(updatedItems);
-  }
+      .then((r)=>r.json())
+      .then((data)=>(setItems(data)))
+  },[])
 
   function handleAddItem(newItem){
-    setItems([...items, newItem]);
+    setItems([...items, newItem])
+    console.log(items)
   }
 
-  function handleCategoryChange(category) {
-    setSelectedCategory(category);
+  function handleDeleteItem(itemDelete){
+    const remainingItems = items.filter((item)=>item.id !== itemDelete.id)
+    setItems(remainingItems)
   }
 
-  const itemsToDisplay = items.filter((item) => {
-    if (selectedCategory === "All") return true;
+  function handleUpdateItem(updatedItem){
+    const updatedItems = items.map((item)=> item.id===updatedItem.id ? updatedItem : item)
+    setItems(updatedItems)
+  }
 
-    return item.category === selectedCategory;
-  });
+  const filteredItems = items.filter((item)=>{
+    if(selectedCategory==="All"){
+      return true
+    }else{
+      return item.category===selectedCategory
+    }
+  })
+  
 
   return (
     <div className="ShoppingList">
-      <ItemForm />
+      <ItemForm onAddItem={handleAddItem}/>
       <Filter
         category={selectedCategory}
-        onCategoryChange={handleCategoryChange}
+        onCategoryChange={setSelectedCategory}
       />
       <ul className="Items">
-        {itemsToDisplay.map((item) => (
-          <Item key={item.id} item={item} />
-        ))}
+        {filteredItems.map((item)=><Item key={item.id} item={item} onDelete={handleDeleteItem} onUpdateItem={handleUpdateItem}/>)}
       </ul>
-    </div>
+    </div> 
   );
 }
 

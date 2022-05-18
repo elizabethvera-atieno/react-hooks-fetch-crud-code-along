@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function ItemForm() {
+function ItemForm({onAddItem}) {
   const [name, setName] = useState("");
   const [category, setCategory] = useState("Produce");
 
@@ -11,10 +11,10 @@ function ItemForm() {
       category: category,
       isInCart: false,
     };
-    console.log(itemData)
+    // console.log(itemData)
 
     fetch("http://localhost:4000/items",{
-      metod: "POST",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
@@ -23,7 +23,7 @@ function ItemForm() {
       .then((r)=> r.json())
       .then((newItem) => onAddItem(newItem));
   }
-
+ 
   return (
     <form className="NewItem" onSubmit={handleSubmit}>
       <label>
@@ -31,7 +31,7 @@ function ItemForm() {
         <input
           type="text"
           name="name"
-          value={name}
+          value= {name}
           onChange={(e) => setName(e.target.value)}
         />
       </label>
